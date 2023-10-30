@@ -5,27 +5,27 @@ const { User } = require("../models/user");
 const { JWT_SECRET } = process.env;
 
 async function validToken(req, res, next) {
-    const authHeader = req.headers.authorization || "";
-    const [type, token] = authHeader.split(" ");
+  const authHeader = req.headers.authorization || "";
+  const [type, token] = authHeader.split(" ");
 
-    if (type !== "Bearer" || !token) {
+  if (type !== "Bearer" || !token) {
     throw Unauthorized("Not authorized");
-}
+  }
 
-try {
+  try {
     const { id } = jwt.verify(token, JWT_SECRET);
     const user = await User.findById(id);
 
     req.user = user;
-} catch (error) {
+  } catch (error) {
     if (error.name === "JsonWebTokenError") {
-        throw Unauthorized("Not authorized");
+      throw Unauthorized("Not authorized");
     }
-}
+  }
 
-    next();
+  next();
 }
 
 module.exports = {
-    validToken,
+  validToken,
 };

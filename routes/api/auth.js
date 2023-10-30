@@ -6,13 +6,15 @@ const {
   logout,
   userInfo,
   upSubscription,
+  upAvatar,
 } = require("../../controllers/auth.controller");
 const {
-    authUser,
-    upUserSubscription,
+  authUser,
+  upUserSubscription,
 } = require("../../validJoi/validUsers");
 const { validAuth } = require("../../helpers/validAuth");
 const { validToken } = require("../../helpers/validToken");
+const { upload } = require ("../../helpers/uploadAvatar.js")
 
 const authRouter = express.Router();
 
@@ -21,12 +23,18 @@ authRouter.get("/login", validAuth(authUser), ctrlWrapper(login));
 authRouter.post("/logout", ctrlWrapper(validToken), ctrlWrapper(logout));
 authRouter.get("/current", ctrlWrapper(validToken), ctrlWrapper(userInfo));
 authRouter.patch(
-    "/",
-    ctrlWrapper(validToken),
-    validAuth(upUserSubscription),
-    ctrlWrapper(upSubscription)
+  "/",
+  ctrlWrapper(validToken),
+  validAuth(upUserSubscription),
+  ctrlWrapper(upSubscription)
+);
+authRouter.post(
+  "/avatars",
+  ctrlWrapper(validToken),
+  upload.single("avatar"),
+  ctrlWrapper(upAvatar)
 );
 
 module.exports = {
-    authRouter,
+  authRouter,
 };
