@@ -18,7 +18,6 @@ async function register(req, res, next) {
   const hashedPassword = await bcrypt.hash(password, salt);
 
   const verificationToken = nanoid();
-
   try {
     const savedUser = await User.create({
       email,
