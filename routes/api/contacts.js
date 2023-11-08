@@ -24,31 +24,12 @@ router.get("/", ctrlWrapper(validToken), ctrlWrapper(getAllContacts));
 
 router.get("/:contactId", ctrlWrapper(validToken), ctrlWrapper(getContactById));
 
-router.post(
-  "/",
-  ctrlWrapper(validToken),
-  validContact(newContacts),
-  ctrlWrapper(addContact)
-);
+router.post("/", ctrlWrapper(validToken), validContact(newContacts), ctrlWrapper(addContact));
 
-router.delete(
-  "/:contactId",
-  ctrlWrapper(validToken),
-  ctrlWrapper(removeContact)
-);
+router.delete("/:contactId", ctrlWrapper(validToken), ctrlWrapper(removeContact));
 
-router.put(
-  "/:contactId",
-  ctrlWrapper(validToken),
-  validUpdateContact(editContacts),
-  ctrlWrapper(updateContact)
-);
+router.put("/:contactId", ctrlWrapper(validToken), validUpdateContact(editContacts), ctrlWrapper(updateContact));
 
-router.patch(
-  "/:contactId/favorite",
-  ctrlWrapper(validToken),
-  validContact(favoriteSchema),
-  ctrlWrapper(updateStatusContact)
-);
+router.patch("/:contactId/favorite", ctrlWrapper(validToken), validContact(favoriteSchema), ctrlWrapper(updateStatusContact));
 
 module.exports = router;

@@ -1,105 +1,83 @@
 const { Contact } = require("../models/contacts");
 
 async function getAllContacts(req, res) {
-    const { id: owner } = req.user;
-    const { page = 1, limit = 20, favorite, name, email } = req.query;
-    const skip = (page - 1) * limit;
+  const { id: owner } = req.user;
+  const { page = 1, limit = 20, favorite } = req.query;
+  const skip = (page - 1) * limit;
 
-    const query = { owner };
+  const allContacts = await Contact.find({ owner })
+    .limit(Number(limit))
+    .skip(Number(skip));
 
-    if (favorite !== undefined) {
-        query.favorite = favorite;
-    }
-
-    if (name) {
-        query.name = name;
-    }
-
-    if (email) {
-        query.email = email;
-    }
-
-    const allContacts = await Contact.find(query)
-        .limit(Number(limit))
-        .skip(Number(skip));
-
+  if (!favorite) {
     res.status(200).json(allContacts);
+  } else {
+    const favoriteContacts = allContacts.filter(
+      (contact) => contact.favorite.toString() === favorite
+    );
+    res.status(200).json(favoriteContacts);
+  }
 }
 
 async function getContactById(req, res) {
-    const { contactId } = req.params;
-    const { id: owner } = req.user;
+  const { contactId } = req.params;
+  const contactById = await Contact.findById(contactId);
 
-    const contactById = await Contact.findOne({ _id: contactId, owner });
+  if (!contactById) {
+    return res.status(404).json({ message: "Not found" });
+  }
 
-    if (!contactById) {
-        return res.status(404).json({ message: "Not found" });
-    }
-
-    res.status(200).json(contactById);
+  res.status(200).json(contactById);
 }
 
 async function addContact(req, res) {
-    const { name, email, phone } = req.body;
-    const { id: owner } = req.user;
-    const newContact = await Contact.create({ name, email, phone, owner });
-    console.log("NewContact", newContact);
+  const { name, email, phone } = req.body;
+  const { id: owner } = req.user;
+  const NewContact = await Contact.create({ name, email, phone, owner });
+  console.log("NewContact", NewContact);
 
-    res.status(201).json(newContact);
+  res.status(201).json(NewContact);
 }
 
 async function removeContact(req, res) {
-    const { contactId } = req.params;
-    const { id: owner } = req.user;
+  const { contactId } = req.params;
+  const remove = await Contact.findByIdAndRemove(contactId);
 
-    const remove = await Contact.findOneAndRemove({ _id: contactId, owner });
+  if (!remove) {
+    return res.status(404).json({ message: "Not found" });
+  }
 
-    if (!remove) {
-        return res.status(404).json({ message: "Not found" });
-    }
-
-    return res.status(200).json({ message: "Contact deleted" });
+  return res.status(200).json({ message: "Contact deleted" });
 }
 
 async function updateContact(req, res) {
-    const { contactId } = req.params;
-    const { id: owner } = req.user;
-
-    const upContact = await Contact.findOneAndUpdate(
-        { _id: contactId, owner },
-        req.body,
-        { new: true }
-    );
-
-    if (!upContact) {
-        return res.status(404).json({ message: "Not found" });
-    }
-
-    res.status(200).json(upContact);
+  const { contactId } = req.params;
+  const upContact = await Contact.findByIdAndUpdate(contactId, req.body, {
+    new: true,
+  });
+  console.log("upContact", upContact);
+  if (!upContact) {
+    return res.status(404).json({ message: "Not found" });
+  }
+  res.status(200).json(upContact);
 }
 
 async function updateStatusContact(req, res) {
-    const { contactId } = req.params;
-    const { id: owner } = req.user;
-
-    const upContact = await Contact.findOneAndUpdate(
-        { _id: contactId, owner },
-        req.body,
-        { new: true }
-    );
-
-    if (!upContact) {
-        return res.status(404).json({ message: "Not found" });
-    }
-
-    res.status(200).json(upContact);
+  const { contactId } = req.params;
+  const upContact = await Contact.findByIdAndUpdate(contactId, req.body, {
+    new: true,
+  });
+  if (!upContact) {
+    return res.status(404).json({ message: "Not found" });
+  }
+  res.status(200).json(upContact);
 }
 
 module.exports = {
-    getAllContacts,
-    getContactById,
-    addContact,
-    removeContact,
-    updateContact,
-    updateStatusContact,
+  getAllContacts,
+  getContactById,
+  addContact,
+  removeContact,
+  updateContact,
+  updateStatusContact,
 };
